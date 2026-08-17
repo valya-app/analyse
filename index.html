@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Конкурентный анализ DR.CAPE — Золотое Яблоко</title>
+  <style>
+    :root {
+      --bg: #f6f7f9;
+      --card: #ffffff;
+      --text: #1a1a1a;
+      --text-muted: #6b7280;
+      --primary: #111827;
+      --accent: #f59e0b;
+      --border: #e5e7eb;
+      --radius: 16px;
+      --shadow: 0 4px 24px rgba(0,0,0,0.06);
+      --green: #10b981;
+      --blue: #3b82f6;
+      --purple: #8b5cf6;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      margin: 0 0 12px;
+      letter-spacing: -0.5px;
+    }
+
+    header p {
+      color: var(--text-muted);
+      max-width: 720px;
+      margin: 0 auto;
+      font-size: 1.05rem;
+    }
+
+    .badge {
+      display: inline-block;
+      background: var(--primary);
+      color: #fff;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 28px;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    }
+
+    .card h2 {
+      margin: 0 0 6px;
+      font-size: 1.25rem;
+    }
+
+    .card .query {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 20px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .stat {
+      background: var(--bg);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .stat .value {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .stat .label {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      margin-top: 4px;
+    }
+
+    .section-title {
+      font-size: 1.6rem;
+      margin: 56px 0 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-title::before {
+      content: "";
+      width: 6px;
+      height: 28px;
+      background: var(--accent);
+      border-radius: 3px;
+    }
+
+    .full-width {
+      grid-column: 1 / -1;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+    }
+
+    th, td {
+      padding: 14px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      background: #fafafa;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    tr:hover td { background: #fafafa; }
+
+    .rating { color: var(--accent); font-weight: 700; }
+    .price { font-weight: 700; white-space: nowrap; }
+    .reviews { color: var(--text-muted); }
+
+    .link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--blue);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .link:hover { text-decoration: underline; }
+
+    .link svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .note {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      max-width: 320px;
+    }
+
+    .tag {
+      display: inline-block;
+      background: #eef2ff;
+      color: var(--blue);
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .recommendations {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+    }
+
+    .recommendation {
+      border-left: 4px solid var(--accent);
+    }
+
+    .recommendation h3 { margin: 0 0 10px; }
+    .recommendation p { color: var(--text-muted); margin: 0; }
+
+    .bar-chart {
+      margin-top: 16px;
+    }
+
+    .bar-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .bar-label {
+      width: 120px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .bar-value {
+      flex: 1;
+      height: 24px;
+      background: var(--bg);
+      border-radius: 12px;
+      overflow: hidden;
+      margin: 0 12px;
+    }
+
+    .bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--blue), var(--purple));
+      border-radius: 12px;
+      min-width: 4px;
+    }
+
+    .bar-count {
+      width: 30px;
+      text-align: right;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      margin-top: 64px;
+      padding: 24px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    @media (max-width: 640px) {
+      header h1 { font-size: 1.8rem; }
+      .stats { grid-template-columns: 1fr; }
+      th, td { padding: 10px 8px; font-size: 0.85rem; }
+      .bar-label { width: 90px; }
+      .note { max-width: 200px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="badge">Конкурентный анализ</div>
+      <h1>DR.CAPE: твердый шампунь для бороды, тоник и воск</h1>
+      <p>Анализ выдачи Золотого Яблока по трем категориям: размер рынка, ключевые игроки, ценовые и рейтинговые метрики, а также карточки конкурентов с прямыми ссылками для изучения отзывов, состава и объемов.</p>
+    </header>
+
+    <section class="grid">
+      <div class="card">
+        <h2>Твердый шампунь</h2>
+        <div class="query">Запрос: «твердый шампунь»</div>
+        <div class="stats">
+          <div class="stat"><div class="value">206</div><div class="label">товаров в выдаче</div></div>
+          <div class="stat"><div class="value">553 ₽</div><div class="label">средняя цена</div></div>
+          <div class="stat"><div class="value">4.58★</div><div class="label">средний рейтинг</div></div>
+          <div class="stat"><div class="value">75%</div><div class="label">со скидкой</div></div>
+        </div>
+        <div class="tag">Топ: GREENERA, BE.SAGE, SAVONRY</div>
+      </div>
+
+      <div class="card">
+        <h2>Тоник для волос</h2>
+        <div class="query">Запрос: «тоник для волос»</div>
+        <div class="stats">
+          <div class="stat"><div class="value">404</div><div class="label">товаров в выдаче</div></div>
+          <div class="stat"><div class="value">2 315 ₽</div><div class="label">средняя цена</div></div>
+          <div class="stat"><div class="value">4.55★</div><div class="label">средний рейтинг</div></div>
+          <div class="stat"><div class="value">64%</div><div class="label">со скидкой</div></div>
+        </div>
+        <div class="tag">Топ: ТОНИКА, ESTEL, LIKATO</div>
+      </div>
+
+      <div class="card">
+        <h2>Воск для волос</h2>
+        <div class="query">Запрос: «воск для укладки волос»</div>
+        <div class="stats">
+          <div class="stat"><div class="value">236</div><div class="label">товаров в выдаче</div></div>
+          <div class="stat"><div class="value">1 976 ₽</div><div class="label">средняя цена</div></div>
+          <div class="stat"><div class="value">4.24★</div><div class="label">средний рейтинг</div></div>
+          <div class="stat"><div class="value">65%</div><div class="label">со скидкой</div></div>
+        </div>
+        <div class="tag">Топ: NISHMAN, OSTWINT, CONSTANT DELIGHT</div>
+      </div>
+    </section>
+
+    <h2 class="section-title">Конкуренты для изучения</h2>
+
+    <div class="grid">
+      <div class="card full-width">
+        <h2>Твердый шампунь для бороды <span class="tag">3 продукта в выдаче</span></h2>
+        <p style="color: var(--text-muted); margin-top: 6px;">Узкая ниша почти свободная: всего 3 продукта. Средний чек ~499 ₽.</p>
+        <table style="margin-top: 18px;">
+          <thead>
+            <tr>
+              <th>Бренд</th>
+              <th>Название</th>
+              <th>Рейтинг</th>
+              <th>Отзывы</th>
+              <th>Цена</th>
+              <th>Ссылка</th>
+              <th>Что изучать</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>BARBARO</strong></td>
+              <td>Шампунь для бороды твердый</td>
+              <td class="rating">5.0★</td>
+              <td class="reviews">23</td>
+              <td class="price">944 ₽</td>
+              <td><a class="link" href="https://goldapple.ru/19000026919-barbaro-solid" target="_blank">Открыть <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a></td>
+              <td class="note">Лидер ниши: максимальный рейтинг, премиальная цена.</td>
+            </tr>
+            <tr>
+              <td><strong>BE.SAGE</strong></td>
+              <td>Твердый шампунь для бороды</td>
+              <td class="rating">4.8★</td>
+              <td class="reviews">18</td>
+              <td class="price">261 ₽</td>
+              <td><a class="link" href="https://goldapple.ru/19000089739-by-nature-for-men" target="_blank">Открыть <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a></td>
+              <td class="note">Бюджетный конкурент, позиционирование for men.</td>
+            </tr>
+            <tr>
+              <td><strong>GREENERA</strong></td>
+              <td>Шампунь для бороды</td>
+              <td class="reviews">—</td>
+              <td class="reviews">—</td>
+              <td class="price">294 ₽</td>
+              <td><a class="link" href="https://goldapple.ru/19000485933-tverdyj" target="_blank">Открыть <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a></td>
+              <td class="note">Новый игрок, цена около 300 ₽, без отзывов.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card full-width">
+        <h2>Тоник фиксирующий / для укладки <span class="tag">47 продуктов в выдаче</span></h2>
+        <p style="color: var(--text-muted); margin-top: 6px;">Запрос «тоник для укладки волос». Средний чек ~2 729 ₽, но BOYS TOYS и NISHMAN задают более доступный сегмент.</p>
+        <table style="margin-top: 18px;">
+          <thead>
+            <tr>
+              <th>Бренд</th>
+              <th>Название</th>
+              <th>Рейтинг</th>
+              <th>Отзывы</th>
+              <th>Цена</th>
+              <th>Ссылка</th>
+              <th>Что изучать</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>BOYS TOYS</strong></td>
+              <td>Фиксирующий тоник для волос</td>
+              <td class="rating">5.0★</td>
+              <td class="reviews">22</td>
+              <td class="price">774 ₽</td>
+              <td><a class="link" href="https://goldapple.ru/19000020446-grooming-tonic" target="_blank">Открыть <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a></td>
+              <td class="note">Прямой конкурент: «фиксирующий тоник», максимальный рейтинг.</td>
+            </tr>
+            <tr>
+              <td><strong>NISHMAN</strong></td>
+              <td>Восстанавливающий тоник для волос</td>
+              <td class="rating">5.0★</td>
+              <td class="reviews">3</td>
+              <td class="price">1 206 ₽</td>
+              <td><a class="link" href="https://goldapple.ru/19000486544-chilly" target="_blank">Открыть <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a></td>
+              <td class="note">Тоник от NISHMAN с высоким рейтингом, ценовой бенчмарк.</td>
+            </tr>
+            <tr>
+              <td><strong>MORGANS</strong></td>
+              <td>Тоник для волос (glazing)</td>
+              <td class="reviews">—</td>
+              <td class="reviews">6</td>
+              <td class="price">2 886 ₽</td>
+              <td><a class="link" href="https://goldapple.ru/19000426736-glazing" target="_blank">Открыть <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a></td>
+              <td class="note">Тоник для волос объемом 250 мл, премиальный сегмент, 6 отзывов.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card full-width">
+        <h2>Воск для волос <span class="tag">236 продуктов в выдаче</span></h2>
+        <p style="color: var(--text-muted); margin-top: 6px;">Конкуренты под мужскую груминг-линейку: NISHMAN, BOYS TOYS, BARBARO. Акцент на матовых глинах и восках для укладки.</p>
+        <table style="margin-top: 18px;">
+          <thead>
+            <tr>
+              <th>Бренд</th>
+              <th>Название</th>
+              <th>Рейтинг</th>
+              <th>Отзывы</th>
+              <th>Цена</th>
+              <th>Ссылка</th>
+              <th>Что изучать</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>NISHMAN</strong></td>
+              <td>Матовая глина для волос</td>
+              <td class="rating">4.7★</td>
+              <td class="reviews">125</td>
+              <td class="price">627 ₽</td>
+              <td><a class="link" href="https://goldapple.ru/19000172975-keratin-m2" target="_blank">Открыть <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a></td>
+              <td class="note">Лидер по отзывам среди мужских груминг-брендов, доступная цена.</td>
+            </tr>
+            <tr>
+              <td><strong>BOYS TOYS</strong></td>
+              <td>Глина для укладки волос средней фиксации</td>
+              <td class="rating">4.8★</td>
+              <td class="reviews">97</td>
+              <td class="price">1 179 ₽</td>
+              <td><a class="link" href="https://goldapple.ru/19000008030-invisible-forming-matte-clay" target="_blank">Открыть <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a></td>
+              <td class="note">Мужской груминг-бренд, матовая глина средней фиксации.</td>
+            </tr>
+            <tr>
+              <td><strong>BARBARO</strong></td>
+              <td>Матовый воск для укладки волос</td>
+              <td class="rating">4.7★</td>
+              <td class="reviews">15</td>
+              <td class="price">1 529 ₽</td>
+              <td><a class="link" href="https://goldapple.ru/19000026897-hair-wax" target="_blank">Открыть <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a></td>
+              <td class="note">Премиальный сегмент, тот же бренд, что и лидер в шампунях для бороды.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <h2 class="section-title">Распределение топ-брендов в категориях</h2>
+    <div class="grid">
+      <div class="card">
+        <h2>Твердый шампунь</h2>
+        <div class="bar-chart">
+          <div class="bar-row"><div class="bar-label">GREENERA</div><div class="bar-value"><div class="bar-fill" style="width: 100%"></div></div><div class="bar-count">14</div></div>
+          <div class="bar-row"><div class="bar-label">BE.SAGE</div><div class="bar-value"><div class="bar-fill" style="width: 64%"></div></div><div class="bar-count">9</div></div>
+          <div class="bar-row"><div class="bar-label">SAVONRY</div><div class="bar-value"><div class="bar-fill" style="width: 64%"></div></div><div class="bar-count">9</div></div>
+          <div class="bar-row"><div class="bar-label">СПИВАКЪ</div><div class="bar-value"><div class="bar-fill" style="width: 43%"></div></div><div class="bar-count">6</div></div>
+          <div class="bar-row"><div class="bar-label">CAFÉ MIMI</div><div class="bar-value"><div class="bar-fill" style="width: 36%"></div></div><div class="bar-count">5</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Тоник для волос</h2>
+        <div class="bar-chart">
+          <div class="bar-row"><div class="bar-label">ТОНИКА</div><div class="bar-value"><div class="bar-fill" style="width: 100%"></div></div><div class="bar-count">10</div></div>
+          <div class="bar-row"><div class="bar-label">ESTEL</div><div class="bar-value"><div class="bar-fill" style="width: 70%"></div></div><div class="bar-count">7</div></div>
+          <div class="bar-row"><div class="bar-label">LIKATO</div><div class="bar-value"><div class="bar-fill" style="width: 30%"></div></div><div class="bar-count">3</div></div>
+          <div class="bar-row"><div class="bar-label">AROMATICA</div><div class="bar-value"><div class="bar-fill" style="width: 20%"></div></div><div class="bar-count">2</div></div>
+          <div class="bar-row"><div class="bar-label">SYSTEM</div><div class="bar-value"><div class="bar-fill" style="width: 20%"></div></div><div class="bar-count">2</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Воск для волос</h2>
+        <div class="bar-chart">
+          <div class="bar-row"><div class="bar-label">NISHMAN</div><div class="bar-value"><div class="bar-fill" style="width: 100%"></div></div><div class="bar-count">15</div></div>
+          <div class="bar-row"><div class="bar-label">OSTWINT</div><div class="bar-value"><div class="bar-fill" style="width: 60%"></div></div><div class="bar-count">9</div></div>
+          <div class="bar-row"><div class="bar-label">CONSTANT DELIGHT</div><div class="bar-value"><div class="bar-fill" style="width: 53%"></div></div><div class="bar-count">8</div></div>
+          <div class="bar-row"><div class="bar-label">HIPSTER</div><div class="bar-value"><div class="bar-fill" style="width: 47%"></div></div><div class="bar-count">7</div></div>
+          <div class="bar-row"><div class="bar-label">SELECTIVE</div><div class="bar-value"><div class="bar-fill" style="width: 47%"></div></div><div class="bar-count">7</div></div>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">Выводы</h2>
+    <div class="recommendations">
+      <div class="card recommendation">
+        <h3>Твердый шампунь для бороды</h3>
+        <p>Самая свободная ниша: всего 3 продукта. Ориентир — BARBARO (944 ₽). DR.CAPE не делает продукт дешевле Barbaro. Рекомендуемая ценовая точка: не ниже 900 ₽, формат 50–80 г, позиционирование «для бороды и усов».</p>
+      </div>
+      <div class="card recommendation">
+        <h3>Тоник фиксирующий</h3>
+        <p>Прямой конкурент — BOYS TOYS (774 ₽, 22 отзыва). NISHMAN предлагает тоники 1200–1400 ₽. Окно для DR.CAPE: 800–1200 ₽ с мужским позиционированием и акцентом на фиксацию. Формат (спрей/лосьон/крем-тоник) — на выбор, спрей удобен для быстрого нанесения, но не обязателен.</p>
+      </div>
+      <div class="card recommendation">
+        <h3>Воск для волос</h3>
+        <p>Мужские груминг-бренды: NISHMAN (~600–900 ₽), BOYS TOYS (~1100–1200 ₽), BARBARO (~1500 ₽). Для DR.CAPE рекомендуется матовая глина или воск сильной фиксации в диапазоне 700–1100 ₽. Важно учитывать объем: цена сильно зависит от граммажа, удобнее сравнивать стоимость за грамм.</p>
+      </div>
+    </div>
+
+    <footer>
+      Источник данных: goldapple.ru · Анализ проведен 17 августа 2026 · Методология: автоматический сбор карточек товаров со страниц поиска по указанным запросам.
+    </footer>
+  </div>
+</body>
+</html>
